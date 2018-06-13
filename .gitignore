@@ -1,4 +1,4 @@
-dist
+*Build
 .cache
 node_modules
 *.log

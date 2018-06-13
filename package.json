@@ -5,9 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "parcel build index.ts --target node",
-    "stop": "forever stop dist/index.js",
-    "start": "forever -l forever.log -o out.log -e err.log -a start dist/index.js"
+    "parcel": "parcel",    
+    "forever": "forever"
   },
   "repository": {
     "type": "git",
