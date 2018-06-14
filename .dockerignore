@@ -1,0 +1,6 @@
+Dockerfile
+*Build
+.cache
+node_modules
+*.log
+docker-compose.yml

@@ -1,0 +1,37 @@
+version: '3'
+services:
+  dev-be:
+    build:
+      context: .
+      args:
+        MAKE: dev-be
+    volumes:
+    - ./server:/usr/src/app/server
+    - serverBuild:/usr/src/app/serverBuild
+  dev-fe:
+    build:
+      context: .
+      args:
+        MAKE: dev-fe
+    volumes:
+    - ./client:/usr/src/app/client
+    - clientBuild:/usr/src/app/clientBuild
+    ports:
+      - "6873:6873"
+  dev-forever:
+    build:
+      context: .
+      args:
+        MAKE: dev-forever
+    volumes:
+    - serverBuild:/usr/src/app/serverBuild
+    - clientBuild:/usr/src/app/clientBuild
+    depends_on:
+      - dev-be
+      - dev-fe
+    ports:
+    - "8080:8080"
+
+volumes:
+  serverBuild:
+  clientBuild:
