@@ -2,3 +2,6 @@
 .cache
 node_modules
 *.log
+.env
+.nyc_output
+coverage
