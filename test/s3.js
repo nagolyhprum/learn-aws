@@ -4,7 +4,8 @@ import {
   createBucket,
   putObject,
   getObject,
-  listBuckets
+  listBuckets,
+  listObjects
 } from "../server/api/s3";
 import services from "../server/api/services";
 const integrationS3 = services.s3();
@@ -60,4 +61,11 @@ describe("s3", () => {
       return expect(listBuckets(integrationS3)).to.eventually.deep.equal([bucket]);
     })
   })
+  describe("listObjects", () => {
+    it("list all objects in bucket", () => {
+      return expect(listObjects(integrationS3, {
+        bucket
+      })).to.eventually.deep.equal([key]);      
+    });
+  });
 });

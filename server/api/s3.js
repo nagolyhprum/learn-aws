@@ -5,7 +5,7 @@ import {
   GraphQLList
 } from 'graphql';
 
-export const createBucket = (client, args, req) => {
+export const createBucket = (client, args) => {
   return new Promise((resolve, reject) => {
     client.createBucket({ 
       Bucket : args.bucket 
@@ -15,7 +15,7 @@ export const createBucket = (client, args, req) => {
   });
 }
 
-export const putObject = (client, args, req) => {
+export const putObject = (client, args) => {
   return new Promise((resolve, reject) => {
     client.putObject({ 
       Bucket : args.bucket,
@@ -27,7 +27,7 @@ export const putObject = (client, args, req) => {
   });        
 }
 
-export const getObject = (client, args, req) => {        
+export const getObject = (client, args) => {        
   return new Promise((resolve, reject) => {
     client.getObject({ 
       Bucket : args.bucket,
@@ -42,6 +42,16 @@ export const listBuckets = (client) => {
   return new Promise((resolve, reject) => {    
     client.listBuckets({}, (err, data) => {
       err ? reject(err) : resolve(data.Buckets.map(bucket => bucket.Name));
+    });
+  });        
+}
+
+export const listObjects = (client, args) => {        
+  return new Promise((resolve, reject) => {    
+    client.listObjects({
+      Bucket : args.bucket
+    }, (err, data) => {
+      err ? reject(err) : resolve(data.Contents.map(object => object.Key));
     });
   });        
 }
@@ -91,7 +101,19 @@ export default new GraphQLObjectType({
     },
 
     listBuckets : {
+      //TODO : update with create date and what not
       type : new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(GraphQLString))),
+      resolve : listBuckets
+    },
+
+    listObjects : {
+      //TODO : update with create date and what not
+      type : new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(GraphQLString))),
+      args : {
+        bucket : {
+          type : GraphQLString        
+        }
+      },
       resolve : listBuckets
     }
   }

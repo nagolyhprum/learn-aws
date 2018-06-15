@@ -12,6 +12,8 @@ Please install make using the following command:
 $ npm i -g make
 ```
 
+Also be sure to have the latest `docker` and `docker-compose` installed.
+
 Run
 ===
 
