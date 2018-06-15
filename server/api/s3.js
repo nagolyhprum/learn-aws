@@ -2,15 +2,20 @@ import {
   GraphQLObjectType,
   GraphQLString,
   GraphQLNonNull,
-  GraphQLList
+  GraphQLList,
+  GraphQLBoolean
 } from 'graphql';
+
+const NNBoolean = new GraphQLNonNull(GraphQLBoolean),
+  NNString = new GraphQLNonNull(GraphQLString),
+  NNList = type => new GraphQLNonNull(new GraphQLList(type));
 
 export const createBucket = (client, args) => {
   return new Promise((resolve, reject) => {
     client.createBucket({ 
       Bucket : args.bucket 
     }, (err, data) => {
-      resolve(err ? `${err}` : null);
+      err ? reject(err) : resolve(true);
     });
   });
 }
@@ -22,7 +27,7 @@ export const putObject = (client, args) => {
       Key : args.key,
       Body : args.body
     }, (err, data) => {
-      resolve(err ? `${err}` : null);
+      err ? reject(err) : resolve(true);
     });
   });        
 }
@@ -33,7 +38,7 @@ export const getObject = (client, args) => {
       Bucket : args.bucket,
       Key : args.key
     }, (err, data) => {
-      resolve(err ? `${err}` : data.Body.toString("utf-8"));
+      err ? reject(err) : resolve(data.Body.toString("utf-8"));
     });
   });        
 }
@@ -64,13 +69,13 @@ export default {
       getObject : {
         //TODO : change type
         //"{\"LastModified\":\"2018-06-15T16:52:06.000Z\",\"ContentLength\":7,\"ETag\":\"\\\"438d4ab10c65f4523812335df8a32338\\\"\",\"ContentType\":\"application/octet-stream\",\"Metadata\":{},\"Body\":{\"type\":\"Buffer\",\"data\":[109,121,32,98,111,100,121]}}"
-        type : new GraphQLNonNull(GraphQLString),
+        type : NNString,
         args : {
           bucket : {
-            type : GraphQLString        
+            type : NNString        
           },
           key : {
-            type : GraphQLString
+            type : NNString
           }        
         },
         resolve : getObject
@@ -78,16 +83,16 @@ export default {
 
       listBuckets : {
         //TODO : update with create date and what not
-        type : new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(GraphQLString))),
+        type : NNList(NNString),
         resolve : listBuckets
       },
 
       listObjects : {
         //TODO : update with create date and what not
-        type : new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(GraphQLString))),
+        type : NNList(NNString),
         args : {
           bucket : {
-            type : GraphQLString        
+            type : NNString        
           }
         },
         resolve : listObjects
@@ -99,26 +104,26 @@ export default {
     name : "s3_mutation",
     fields : {
       createBucket : {
-        type : GraphQLString,
+        type : NNBoolean,
         args : {
           bucket : {
-            type : GraphQLString
+            type : NNString
           }
         },
         resolve : createBucket
       },
 
       putObject : {
-        type : GraphQLString,
+        type : NNBoolean,
         args : {
           bucket : {
-            type : GraphQLString        
+            type : NNString        
           },
           key : {
-            type : GraphQLString
+            type : NNString
           },
           body : {
-            type : GraphQLString
+            type : NNString
           }
         },
         resolve : putObject

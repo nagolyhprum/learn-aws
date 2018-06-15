@@ -18,12 +18,12 @@ describe("s3", () => {
     it("creates bucket", () => {
       return expect(createBucket(integrationS3, {
         bucket
-      })).to.eventually.not.exist;
+      })).to.eventually.be.true;
     });
     it("prevents duplicate buckets", () => {
       return expect(createBucket(integrationS3, {
         bucket
-      })).to.eventually.exist;
+      })).to.eventually.be.rejected;
     });
   });
   describe("putObject", () => {
@@ -32,14 +32,14 @@ describe("s3", () => {
         bucket,
         key,
         body
-      })).to.eventually.not.exist;      
+      })).to.eventually.be.true;      
     });
     it("cant put to non existant bucket", () => {
       return expect(putObject(integrationS3, {
         bucket : "bucket.dne",
         key,
         body
-      })).to.eventually.exist;      
+      })).to.eventually.be.rejected;      
     })
   });
   describe("getObject", () => {
@@ -53,7 +53,7 @@ describe("s3", () => {
       return expect(getObject(integrationS3, {
         bucket,
         key : "key.dne"
-      })).to.eventually.exist;      
+      })).to.eventually.be.rejected;      
     })
   });
   describe("listBuckets", () => {
