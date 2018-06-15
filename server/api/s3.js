@@ -56,65 +56,74 @@ export const listObjects = (client, args) => {
   });        
 }
 
-export default new GraphQLObjectType({
-  name : "s3",
-  fields : {
-    createBucket : {
-      type : GraphQLString,
-      args : {
-        bucket : {
-          type : GraphQLString
-        }
-      },
-      resolve : createBucket
-    },
+export default {
 
-    putObject : {
-      type : GraphQLString,
-      args : {
-        bucket : {
-          type : GraphQLString        
+  query : new GraphQLObjectType({
+    name : "s3_query",
+    fields : {
+      getObject : {
+        //TODO : change type
+        //"{\"LastModified\":\"2018-06-15T16:52:06.000Z\",\"ContentLength\":7,\"ETag\":\"\\\"438d4ab10c65f4523812335df8a32338\\\"\",\"ContentType\":\"application/octet-stream\",\"Metadata\":{},\"Body\":{\"type\":\"Buffer\",\"data\":[109,121,32,98,111,100,121]}}"
+        type : new GraphQLNonNull(GraphQLString),
+        args : {
+          bucket : {
+            type : GraphQLString        
+          },
+          key : {
+            type : GraphQLString
+          }        
         },
-        key : {
-          type : GraphQLString
+        resolve : getObject
+      },
+
+      listBuckets : {
+        //TODO : update with create date and what not
+        type : new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(GraphQLString))),
+        resolve : listBuckets
+      },
+
+      listObjects : {
+        //TODO : update with create date and what not
+        type : new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(GraphQLString))),
+        args : {
+          bucket : {
+            type : GraphQLString        
+          }
         },
-        body : {
-          type : GraphQLString
-        }
-      },
-      resolve : putObject
-    },
-
-    getObject : {
-      //TODO : change type
-      //"{\"LastModified\":\"2018-06-15T16:52:06.000Z\",\"ContentLength\":7,\"ETag\":\"\\\"438d4ab10c65f4523812335df8a32338\\\"\",\"ContentType\":\"application/octet-stream\",\"Metadata\":{},\"Body\":{\"type\":\"Buffer\",\"data\":[109,121,32,98,111,100,121]}}"
-      type : new GraphQLNonNull(GraphQLString),
-      args : {
-        bucket : {
-          type : GraphQLString        
-        },
-        key : {
-          type : GraphQLString
-        }        
-      },
-      resolve : getObject
-    },
-
-    listBuckets : {
-      //TODO : update with create date and what not
-      type : new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(GraphQLString))),
-      resolve : listBuckets
-    },
-
-    listObjects : {
-      //TODO : update with create date and what not
-      type : new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(GraphQLString))),
-      args : {
-        bucket : {
-          type : GraphQLString        
-        }
-      },
-      resolve : listBuckets
+        resolve : listObjects
+      }
     }
-  }
-});
+  }),
+
+  mutation : new GraphQLObjectType({
+    name : "s3_mutation",
+    fields : {
+      createBucket : {
+        type : GraphQLString,
+        args : {
+          bucket : {
+            type : GraphQLString
+          }
+        },
+        resolve : createBucket
+      },
+
+      putObject : {
+        type : GraphQLString,
+        args : {
+          bucket : {
+            type : GraphQLString        
+          },
+          key : {
+            type : GraphQLString
+          },
+          body : {
+            type : GraphQLString
+          }
+        },
+        resolve : putObject
+      }
+    }
+  })
+
+}

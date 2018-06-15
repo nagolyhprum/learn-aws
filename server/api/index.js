@@ -13,10 +13,19 @@ import S3 from "./s3";
 
 const schema = new GraphQLSchema({
   query: new GraphQLObjectType({
-    name: 'AWS',
+    name: 'aws_query',
     fields: {
       s3 : {
-        type : new GraphQLNonNull(S3),
+        type : new GraphQLNonNull(S3.query),
+        resolve : services.s3
+      }
+    }
+  }),
+  mutation : new GraphQLObjectType({
+    name: 'aws_mutation',
+    fields: {
+      s3 : {
+        type : new GraphQLNonNull(S3.mutation),
         resolve : services.s3
       }
     }

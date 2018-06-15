@@ -25,14 +25,20 @@ Start a dev server:
 $ make dev
 ```
 
+This will set up a watch on both server and client and add hot reloading in docker.
+
 Start a prod server:
 
 ```bash
 $ make prod
 ```
 
+Will build and run code in forever.
+
 Test your code with coverage:
 
 ```bash
 $ make test
 ```
+
+Fires up docker to do integration testing.
