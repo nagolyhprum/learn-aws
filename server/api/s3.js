@@ -1,7 +1,8 @@
 import {
   GraphQLObjectType,
   GraphQLString,
-  GraphQLNonNull
+  GraphQLNonNull,
+  GraphQLList
 } from 'graphql';
 
 export const createBucket = (client, args, req) => {
@@ -26,13 +27,21 @@ export const putObject = (client, args, req) => {
   });        
 }
 
-export const getObject = (client, args, ) => {        
+export const getObject = (client, args, req) => {        
   return new Promise((resolve, reject) => {
     client.getObject({ 
       Bucket : args.bucket,
       Key : args.key
     }, (err, data) => {
       resolve(err ? `${err}` : data.Body.toString("utf-8"));
+    });
+  });        
+}
+
+export const listBuckets = (client) => {        
+  return new Promise((resolve, reject) => {    
+    client.listBuckets({}, (err, data) => {
+      err ? reject(err) : resolve(data.Buckets.map(bucket => bucket.Name));
     });
   });        
 }
@@ -79,6 +88,11 @@ export default new GraphQLObjectType({
         }        
       },
       resolve : getObject
+    },
+
+    listBuckets : {
+      type : new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(GraphQLString))),
+      resolve : listBuckets
     }
   }
 });

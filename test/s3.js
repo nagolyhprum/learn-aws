@@ -3,7 +3,8 @@ import chaiAsPromised from "chai-as-promised";
 import { 
   createBucket,
   putObject,
-  getObject
+  getObject,
+  listBuckets
 } from "../server/api/s3";
 import services from "../server/api/services";
 const integrationS3 = services.s3();
@@ -54,4 +55,9 @@ describe("s3", () => {
       })).to.eventually.exist;      
     })
   });
+  describe("listBuckets", () => {
+    it("lists all bucket names", () => {
+      return expect(listBuckets(integrationS3)).to.eventually.deep.equal([bucket]);
+    })
+  })
 });
