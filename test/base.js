@@ -6,8 +6,8 @@ const app = {
   use : _ => _
 };
 
-describe("base", () => {
-  it("works", () => {
+describe("Codebase", () => {
+  it("needs to be tested", () => {
     expect(Client()).to.be.equal(true);    
     expect(Server(app)).to.be.equal(app);    
   })

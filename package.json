@@ -11,7 +11,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "cross-env NODE_ENV=test nyc --reporter=text mocha",
+    "test": "cross-env NODE_ENV=test nyc --reporter=lcov mocha",
     "parcel": "parcel",
     "forever": "forever"
   },
@@ -23,10 +23,14 @@
   "license": "ISC",
   "homepage": "https://bitbucket.org/nagolyhprum/learn-aws#readme",
   "dependencies": {
+    "aws-sdk": "^2.258.1",
+    "chai-as-promised": "^7.1.1",
     "dotenv": "^6.0.0",
     "express": "^4.16.3",
-    "parcel-bundler": "^1.8.1",
-    "forever": "^0.15.3"
+    "express-graphql": "^0.6.12",
+    "forever": "^0.15.3",
+    "graphql": "^0.13.2",
+    "parcel-bundler": "^1.8.1"
   },
   "devDependencies": {
     "babel-plugin-istanbul": "^4.1.6",

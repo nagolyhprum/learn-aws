@@ -26,9 +26,11 @@ services:
     volumes:
     - serverBuild:/usr/src/app/serverBuild
     - clientBuild:/usr/src/app/clientBuild
+    - ./coverage:/usr/src/app/coverage
     depends_on:
       - dev-be
       - dev-fe
+      - localstack
     ports:
     - "80:80"
   localstack:
