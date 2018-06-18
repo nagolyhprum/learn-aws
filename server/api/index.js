@@ -35,16 +35,18 @@ const schema = new GraphQLSchema({
 
 export const query = `#call init then read then clean
 
-mutation init($bucket: String!, $key: String!, $body: String!) {
+mutation init($bucket: String!, $key: String!, $body: String!, $source: String!, $copy: String!) {
   s3 {
     createBucket(Bucket: $bucket)
     putObject(Bucket: $bucket, Key: $key, Body: $body)
+    copyObject(Bucket: $bucket, Key: $copy, CopySource: $source)
   }
 }
 
-query read($bucket: String!, $key: String!) {
+query read($bucket: String!, $key: String!, $copy: String!) {
   s3 {
-    getObject(Bucket: $bucket, Key: $key)
+    key: getObject(Bucket: $bucket, Key: $key)
+    copy: getObject(Bucket: $bucket, Key: $copy)
     listBuckets
     listObjects(Bucket: $bucket)
   }
@@ -55,12 +57,16 @@ mutation clean($bucket: String!, $key: String!) {
     deleteObject(Bucket: $bucket, Key: $key)
     deleteBucket(Bucket: $bucket)
   }
-}`;
+}
+
+`;
 
 export const variables = {
-  bucket: "my.name",
+  bucket: "my.bucket",
   key: "my.key",
-  body: "my.body"
+  body: "my.body",
+  copy : "my.copy",
+  source : "my.bucket/my.key"
 };
 
 export const gqlDefaultMiddleware = (req, res, next) => {    

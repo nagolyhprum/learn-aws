@@ -66,6 +66,14 @@ export const deleteObject = (client, args) => {
   }); 
 };
 
+export const copyObject = (client, args) => {
+  return new Promise((resolve, reject) => {
+    client.copyObject(args, (err, data) => {
+      err ? reject(err) : resolve(true);
+    });
+  }); 
+};
+
 export default {
 
   query : new GraphQLObjectType({
@@ -155,6 +163,22 @@ export default {
           }
         },
         resolve : deleteObject
+      },
+
+      copyObject : {
+        type : NNBoolean,
+        args : {
+          Bucket : {
+            type : NNString
+          },
+          CopySource : {
+            type : NNString
+          },
+          Key : {
+            type : NNString
+          }
+        },
+        resolve : copyObject
       }
     }
   })
