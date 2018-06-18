@@ -52,13 +52,13 @@ query read($bucket: String!, $key: String!, $copy: String!) {
   }
 }
 
-mutation clean($bucket: String!, $key: String!) {
+mutation clean($bucket: String!, $key: String!, $copy: String!) {
   s3 {
-    deleteObject(Bucket: $bucket, Key: $key)
+    key: deleteObject(Bucket: $bucket, Key: $key)
+    copy: deleteObject(Bucket: $bucket, Key: $copy)
     deleteBucket(Bucket: $bucket)
   }
 }
-
 `;
 
 export const variables = {
