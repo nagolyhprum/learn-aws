@@ -25,7 +25,7 @@ Start a dev server:
 $ make dev
 ```
 
-This will set up a watch on both server and client and add hot reloading in docker.
+This will set up a watch on both server and client and add hot reloading in docker. You can then navigate to http://localhost/graphql and see some example queries.
 
 Start a prod server:
 

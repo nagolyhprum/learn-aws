@@ -132,6 +132,29 @@ export default {
           }
         },
         resolve : putObject
+      },
+
+      deleteBucket : {
+        type : NNBoolean,
+        args : {
+          Bucket : {
+            type : NNString
+          }
+        },
+        resolve : deleteBucket        
+      },
+
+      deleteObject : {
+        type : NNBoolean,
+        args : {
+          Bucket : {
+            type : NNString        
+          },
+          Key : {
+            type : NNString
+          }
+        },
+        resolve : deleteObject
       }
     }
   })
