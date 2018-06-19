@@ -92,8 +92,7 @@ export const uploadMultipart = (client, args) => {
             Key : args.Key,
             Bucket : args.Bucket,
             PartNumber : i + 1, 
-            UploadId,
-            ContentLength : end - start
+            UploadId
           }, (err, data) => {
             err ? reject(err) : resolve({ ETag : data.ETag, PartNumber : i + 1 });
           })

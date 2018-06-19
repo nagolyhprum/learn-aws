@@ -23,7 +23,7 @@ const Bucket = "my.unique.bucket.name",
   DNE = "my.dne",
   Copy = "my.copy",
   MulipartKey = "my.multipart",
-  MulipartBody = repeater(repeater(repeater("0", 7), 1024), 1025);
+  MulipartBody = repeater(repeater(repeater("0", 6), 1024), 1025);
 
 describe("s3", () => {
   describe("createBucket", () => {    
