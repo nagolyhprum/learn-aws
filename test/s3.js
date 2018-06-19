@@ -23,7 +23,7 @@ const Bucket = "my.unique.bucket.name",
   DNE = "my.dne",
   Copy = "my.copy",
   MulipartKey = "my.multipart",
-  MulipartBody = repeater(repeater(repeater("0", 6), 1024), 1025);
+  MulipartBody = repeater(repeater(repeater("0", 5), 1024), 1025);
 
 describe("s3", () => {
   describe("createBucket", () => {    
@@ -39,7 +39,8 @@ describe("s3", () => {
     });
   });
   describe("uploadMultipart", () => {
-    it("uploads a document", () => {
+    it("uploads a document", function() {
+      this.timeout(10 * 1000)
       return uploadMultipart(integrationS3, {
         Bucket,
         Key : MulipartKey,
@@ -52,6 +53,29 @@ describe("s3", () => {
         }).then(data => {
           expect(data).to.be.equal(MulipartBody);
         });
+      })
+    })
+    it("handles errors", () => {
+      const client = {
+        createMultipartUpload : (args, callback) => callback(new Error("createMultipartUpload")),
+        uploadPart : (args, callback) => callback(new Error("uploadPart")),
+        completeMultipartUpload : (args, callback) => callback(new Error("completeMultipartUpload")),
+        abortMultipartUpload : (args, callback) => callback(new Error("abortMultipartUpload"))
+      };
+      const expectToEventuallyBeRejectedWith = (err, msg) => expect(uploadMultipart(client, {
+        Bucket,
+        Key,
+        Body
+      })).to.eventually.be.rejectedWith(err, msg);
+      return expectToEventuallyBeRejectedWith(Error, "createMultipartUpload").then(() => {
+        client.createMultipartUpload = (...args) => integrationS3.createMultipartUpload(...args);
+        return expectToEventuallyBeRejectedWith(Error, "abortMultipartUpload");
+      }).then(() => {
+        client.abortMultipartUpload = (...args) => integrationS3.abortMultipartUpload(...args);
+        return expectToEventuallyBeRejectedWith(Error, "uploadPart");        
+      }).then(() => {
+        client.uploadPart = (...args) => integrationS3.uploadPart(...args);
+        return expectToEventuallyBeRejectedWith(Error, "completeMultipartUpload");                
       })
     })
   })

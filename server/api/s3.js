@@ -75,38 +75,38 @@ export const copyObject = (client, args) => {
 };
 
 export const uploadMultipart = (client, args) => {
+  const {
+    Bucket,
+    Key,
+    Body
+  } = args;
   return new Promise((resolve, reject) => {
-    client.createMultipartUpload({
-      Key : args.Key,
-      Bucket : args.Bucket
-    }, (err, data) => {
+    client.createMultipartUpload({ Key, Bucket }, (err, data) => {
       if(err) return reject(err);
       const { UploadId } = data;
       const ContentLength = 1024 * 1024 * 5; //must be > 5mb
       Promise.all(
-        Array.from({ length : Math.ceil(args.Body.length / ContentLength) }).map((_, i) => new Promise((resolve, reject) => {
+        Array.from({ length : Math.ceil(Body.length / ContentLength) }).map((_, i) => new Promise((resolve, reject) => {
           const start = i * ContentLength;
-          const end = Math.min(start + ContentLength, args.Body.length);
+          const end = Math.min(start + ContentLength, Body.length);
           client.uploadPart({        
-            Body: args.Body.slice(start, end), 
-            Key : args.Key,
-            Bucket : args.Bucket,
+            Body: Body.slice(start, end), 
+            Key,
+            Bucket,
             PartNumber : i + 1, 
             UploadId
-          }, (err, data) => {
-            err ? reject(err) : resolve({ ETag : data.ETag, PartNumber : i + 1 });
-          })
+          }, (err, data) => err ? reject(err) : resolve({ ETag : data.ETag, PartNumber : i + 1 }))
         }))
-      ).then(Parts => {
+      ).then(Parts => new Promise((resolve, reject) => {
         client.completeMultipartUpload({
-          Bucket: args.Bucket, 
-          Key: args.Key, 
+          Bucket, 
+          Key, 
           MultipartUpload: { Parts }, 
           UploadId
-        }, (err, data) => {
-          err ? reject(err) : resolve(true)
-        })
-      }).catch(reject);
+        }, (err, data) => err ? reject(err) : resolve(true))
+      })).then(resolve).catch((uploadError) => {
+        client.abortMultipartUpload({ Bucket, Key, UploadId }, abortErr => abortErr ? reject(abortErr) : reject(uploadError))
+      });
     });
   });
 }
