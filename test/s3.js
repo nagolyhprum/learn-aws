@@ -9,7 +9,8 @@ import {
   deleteBucket,
   deleteObject,
   copyObject,
-  uploadMultipart
+  uploadMultipart,
+  createPresignedPost
 } from "../server/api/s3";
 import services from "../server/api/services";
 const integrationS3 = services.s3();
@@ -38,6 +39,11 @@ describe("s3", () => {
       })).to.eventually.be.rejected;
     });
   });
+  describe("createPresignedPost", () => {
+    it("generates a url", () => {
+      return expect(createPresignedPost(integrationS3, { Bucket, Key })).to.eventually.exist;
+    })
+  })
   describe("uploadMultipart", () => {
     it("uploads a document", function() {
       this.timeout(10 * 1000)

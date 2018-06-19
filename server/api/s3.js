@@ -111,6 +111,40 @@ export const uploadMultipart = (client, args) => {
   });
 }
 
+export const createPresignedPost = (client, args) => new Promise((resolve, reject) => {  
+  client.createPresignedPost(args, function(err, data) {
+    console.log(JSON.stringify(data, null, "\t"));
+    err ? reject(err) : resolve(data);
+  });
+})
+
+const RemoveDashes = (input, fields) => {
+  fields.forEach(field => {
+    input.fields[field.replace(/-/g, "")] = {
+      type : NNString,
+      resolve : context => context[field]
+    }
+  })
+  return input;
+}
+
+const PresignedPostFields = new GraphQLObjectType(RemoveDashes({
+  name : "PresignedPostFields",
+  fields : {}
+}, ["bucket", "X-Amz-Algorithm", "X-Amz-Credential", "X-Amz-Date", "Policy", "X-Amz-Signature"]))
+
+const PresignedPost = new GraphQLObjectType({
+  name : "PresignedPost",
+  fields : {
+    url : {
+      type : NNString
+    },
+    fields : {
+      type : new GraphQLNonNull(PresignedPostFields)
+    }
+  }
+})
+
 export default {
 
   query : new GraphQLObjectType({
@@ -146,6 +180,19 @@ export default {
           }
         },
         resolve : listObjects
+      },
+
+      createPresignedPost : {
+        type : PresignedPost,
+        args : {
+          Bucket : {
+            type : NNString
+          },
+          Key : {
+            type : NNString
+          }
+        },
+        resolve : createPresignedPost
       }
     }
   }),

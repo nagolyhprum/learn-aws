@@ -1,8 +1,8 @@
 import S3 from 'aws-sdk/clients/s3';
 
 const config = port => ({
-    accessKeyId: "it does not matter",
-    secretAccessKey: "it does not matter",
+    accessKeyId: "accessKeyId",
+    secretAccessKey: "secretAccessKey",
     region: "local",
     endpoint : `http://localstack:${port}`,
     apiVersions: {

@@ -34,7 +34,6 @@ const schema = new GraphQLSchema({
 });
 
 export const query = `#call init then read then clean
-
 mutation init($bucket: String!, $key: String!, $body: String!, $source: String!, $copy: String!) {
   s3 {
     createBucket(Bucket: $bucket)
@@ -57,6 +56,22 @@ mutation clean($bucket: String!, $key: String!, $copy: String!) {
     key: deleteObject(Bucket: $bucket, Key: $key)
     copy: deleteObject(Bucket: $bucket, Key: $copy)
     deleteBucket(Bucket: $bucket)
+  }
+}
+
+query createPresignedPost($key: String!, $bucket: String!) {
+  s3 {
+    createPresignedPost(Key: $key, Bucket: $bucket) {
+      url
+      fields {
+        bucket
+        XAmzAlgorithm
+        XAmzCredential
+        XAmzDate
+        Policy
+        XAmzSignature
+      }
+    }
   }
 }
 `;
