@@ -8,17 +8,22 @@ import {
   listObjects,
   deleteBucket,
   deleteObject,
-  copyObject
+  copyObject,
+  uploadMultipart
 } from "../server/api/s3";
 import services from "../server/api/services";
 const integrationS3 = services.s3();
 chai.use(chaiAsPromised);
 
+const repeater = (input, times) => Array.from({ length : times }).map(() => input).join("");
+
 const Bucket = "my.unique.bucket.name",
   Key = "my.key",
   Body = "my.body",
   DNE = "my.dne",
-  Copy = "my.copy";
+  Copy = "my.copy",
+  MulipartKey = "my.multipart",
+  MulipartBody = repeater(repeater(repeater("0", 7), 1024), 1025);
 
 describe("s3", () => {
   describe("createBucket", () => {    
@@ -33,6 +38,23 @@ describe("s3", () => {
       })).to.eventually.be.rejected;
     });
   });
+  describe("uploadMultipart", () => {
+    it("uploads a document", () => {
+      return uploadMultipart(integrationS3, {
+        Bucket,
+        Key : MulipartKey,
+        Body : MulipartBody
+      }).then(success => {
+        expect(success).to.be.true;
+        return getObject(integrationS3, {
+          Bucket,
+          Key : MulipartKey
+        }).then(data => {
+          expect(data).to.be.equal(MulipartBody);
+        });
+      })
+    })
+  })
   describe("putObject", () => {
     it("puts a new object to the bucket", () => {
       return expect(putObject(integrationS3, {
@@ -99,7 +121,7 @@ describe("s3", () => {
     it("list all objects in bucket", () => {
       return expect(listObjects(integrationS3, {
         Bucket
-      })).to.eventually.deep.equal([Copy, Key]);      
+      })).to.eventually.deep.equal([Copy, Key, MulipartKey]);      
     });
     it("cannot list objects in non-existant bucket", () => {
       return expect(listObjects(integrationS3, {
@@ -117,10 +139,15 @@ describe("s3", () => {
         deleteObject(integrationS3, {
           Bucket,
           Key : Copy
+        }),
+        deleteObject(integrationS3, {
+          Bucket,
+          Key : MulipartKey
         })        
-      ]).then(([a, b]) => {
+      ]).then(([a, b, c]) => {
         expect(a).to.be.true;
         expect(b).to.be.true;
+        expect(c).to.be.true;
         return expect(deleteBucket(integrationS3, {
           Bucket
         })).to.eventually.be.true

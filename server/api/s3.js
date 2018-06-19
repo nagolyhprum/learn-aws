@@ -74,6 +74,44 @@ export const copyObject = (client, args) => {
   }); 
 };
 
+export const uploadMultipart = (client, args) => {
+  return new Promise((resolve, reject) => {
+    client.createMultipartUpload({
+      Key : args.Key,
+      Bucket : args.Bucket
+    }, (err, data) => {
+      if(err) return reject(err);
+      const { UploadId } = data;
+      const ContentLength = 1024 * 1024 * 5; //must be > 5mb
+      Promise.all(
+        Array.from({ length : Math.ceil(args.Body.length / ContentLength) }).map((_, i) => new Promise((resolve, reject) => {
+          const start = i * ContentLength;
+          const end = Math.min(start + ContentLength, args.Body.length);
+          client.uploadPart({        
+            Body: args.Body.slice(start, end), 
+            Key : args.Key,
+            Bucket : args.Bucket,
+            PartNumber : i + 1, 
+            UploadId,
+            ContentLength : end - start
+          }, (err, data) => {
+            err ? reject(err) : resolve({ ETag : data.ETag, PartNumber : i + 1 });
+          })
+        }))
+      ).then(Parts => {
+        client.completeMultipartUpload({
+          Bucket: args.Bucket, 
+          Key: args.Key, 
+          MultipartUpload: { Parts }, 
+          UploadId
+        }, (err, data) => {
+          err ? reject(err) : resolve(true)
+        })
+      }).catch(reject);
+    });
+  });
+}
+
 export default {
 
   query : new GraphQLObjectType({
